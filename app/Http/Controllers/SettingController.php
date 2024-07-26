@@ -4,14 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class SettingController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-//        abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 404);
         abort_if(!in_array(auth()->user()->role_id, [User::SUPER_ADMIN, User::ADMIN]), 403);
 
 
@@ -27,17 +28,15 @@ class SettingController extends Controller
         return view('admin.settings.index')->with(['settings' => $settings]);
     }
 
-    public function create()
+    public function create(): View
     {
-//        abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 404);
         abort_if(!in_array(auth()->user()->role_id, [User::SUPER_ADMIN, User::ADMIN]), 403);
 
         return view('admin.settings.create');
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
-//        abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 404);
         abort_if(!in_array(auth()->user()->role_id, [User::SUPER_ADMIN, User::ADMIN]), 403);
 
         $setting = $request->validate([
@@ -45,7 +44,7 @@ class SettingController extends Controller
             'value' => ['required', 'string'],
         ]);
 
-        Setting::create($setting);
+        Setting::query()->create($setting);
 
         return redirect()->route('admin.settings.index')->with(
             'success',
@@ -53,17 +52,15 @@ class SettingController extends Controller
         );
     }
 
-    public function edit(Setting $setting)
+    public function edit(Setting $setting): View
     {
-//        abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 404);
         abort_if(!in_array(auth()->user()->role_id, [User::SUPER_ADMIN, User::ADMIN]), 403);
 
         return view('admin.settings.edit')->with(['setting' => $setting]);
     }
 
-    public function update(Request $request, Setting $setting)
+    public function update(Request $request, Setting $setting): RedirectResponse
     {
-//        abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 404);
         abort_if(!in_array(auth()->user()->role_id, [User::SUPER_ADMIN, User::ADMIN]), 403);
 
         $data = $request->validate([
@@ -79,9 +76,8 @@ class SettingController extends Controller
         );
     }
 
-    public function destroy(Setting $setting)
+    public function destroy(Setting $setting): RedirectResponse
     {
-//        abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 404);
         abort_if(!in_array(auth()->user()->role_id, [User::SUPER_ADMIN, User::ADMIN]), 403);
 
         $setting->delete();

@@ -8,28 +8,24 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserCollection;
 use App\Models\User;
 use Exception;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Redirector;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\ValidationException;
 use LogicException;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -49,13 +45,13 @@ class UserController extends Controller
 
         $users = new UserCollection($users);
 
-        $studentCount = User::where('role_id', User::STUDENT)->count();
-        $nonStudentCount = User::whereIn('role_id', [User::TEACHER, User::STAFF])->count();
+        $studentCount = User::query()->where('role_id', User::STUDENT)->count();
+        $nonStudentCount = User::query()->whereIn('role_id', [User::TEACHER, User::STAFF])->count();
 
         return view('admin.users.index', compact('users', 'studentCount', 'nonStudentCount'));
     }
 
-    public function create()
+    public function create(): View
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -69,7 +65,7 @@ class UserController extends Controller
         return view('admin.users.create', compact('roles'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -107,7 +103,7 @@ class UserController extends Controller
                 break;
         }
 
-        User::create($credentials);
+        User::query()->create($credentials);
 
         return redirect(route('admin.users.index'))
             ->with(
@@ -118,7 +114,7 @@ class UserController extends Controller
             );
     }
 
-    public function edit(User $user)
+    public function edit(User $user): View
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN || $user->role_id === User::SUPER_ADMIN, 403);
 
@@ -132,7 +128,7 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user', 'roles'));
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $user): RedirectResponse
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -153,7 +149,6 @@ class UserController extends Controller
 
             $data['class'] = $class['class'];
         }
-
 
 //        $password = match ((int) $data['role_id']) {
 //            User::ADMIN => 'ADMIN' . $data['username'],
@@ -181,7 +176,7 @@ class UserController extends Controller
             );
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user): RedirectResponse
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN || $user->role_id === User::SUPER_ADMIN, 403);
 
@@ -194,14 +189,14 @@ class UserController extends Controller
         return redirect(route('admin.users.index'))->with('success', 'Berhasil menghapus user.');
     }
 
-    public function csv()
+    public function csv(): View
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
         return view('admin.users.create-csv');
     }
 
-    public function store_csv(Request $request): Application|RedirectResponse|Redirector|\Illuminate\Foundation\Application
+    public function store_csv(Request $request): RedirectResponse
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -242,7 +237,7 @@ class UserController extends Controller
             });
 
             DB::commit();
-        } catch (Exception $exception) {
+        } catch (Exception) {
             DB::rollBack();
             return redirect(route('admin.users.index'))
                 ->withErrors([
@@ -257,7 +252,7 @@ class UserController extends Controller
             );
     }
 
-    public function export()
+    public function export(): View
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -270,7 +265,7 @@ class UserController extends Controller
         return view('admin.users.export', compact('classes'));
     }
 
-    public function export_download(Request $request)
+    public function export_download(Request $request): BinaryFileResponse
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
@@ -311,7 +306,7 @@ class UserController extends Controller
         return Excel::download(new GuruStaffExport($users), 'Guru&Staff.xlsx');
     }
 
-    public function updatePassword(Request $request)
+    public function updatePassword(Request $request): RedirectResponse
     {
         ini_set('max_execution_time', 1000);
 
@@ -328,7 +323,7 @@ class UserController extends Controller
             });
 
             DB::commit();
-        } catch (Exception $exception) {
+        } catch (Exception) {
             DB::rollBack();
             return redirect('/admin');
         }
