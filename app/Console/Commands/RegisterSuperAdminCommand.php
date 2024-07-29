@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Model;
 
 class RegisterSuperAdminCommand extends Command
 {
@@ -11,16 +12,16 @@ class RegisterSuperAdminCommand extends Command
 
     protected $description = 'Register Super Admin';
 
-    public function __construct(private User $user)
+    public function __construct(private readonly User $user)
     {
         parent::__construct();
     }
 
-    public function handle()
+    public function handle(): void
     {
         $credentials = $this->getCredentials();
 
-        $superAdmin = $this->user->create($credentials);
+        $superAdmin = $this->user::query()->create($credentials);
 
         $this->display($superAdmin);
     }
@@ -52,7 +53,7 @@ class RegisterSuperAdminCommand extends Command
         return $credentials;
     }
 
-    private function display(User $admin): void
+    private function display(Model|User $admin): void
     {
         $headers = ['Name', 'Username', 'Super admin'];
 

@@ -12,7 +12,8 @@ class HoverCandidates extends Component
     public $imageChange;
     public $class;
 
-    public function setHover() {
+    public function setHover(): void
+    {
         $this->hover = !$this->hover;
     }
 

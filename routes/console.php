@@ -6,22 +6,23 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-
-/*
-|--------------------------------------------------------------------------
-| Console Routes
-|--------------------------------------------------------------------------
-|
-| This file is where you may define all of your Closure based console
-| commands. Each Closure is bound to a command instance allowing a
-| simple approach to interacting with each command's IO methods.
-|
-*/
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+})->purpose('Display an inspiring quote')->hourly();
+
+Artisan::command('testajadulu', function () {
+    $nonceSize = openssl_cipher_iv_length('aes-256-cbc');
+    $nonce = openssl_random_pseudo_bytes($nonceSize);
+    $test = openssl_encrypt("hai abangku", 'aes-256-cbc', env('ENCRYPT_KEY'), 0, $nonce);
+    $text = base64_encode($test);
+    Log::info($text);
+    $cipherText = base64_decode($test);
+    $decrypt = openssl_decrypt($cipherText, 'aes-256-cbc', env('ENCRYPT_KEY'), 0, $nonce);
+    Log::info($decrypt);
+});
 
 Artisan::command('import:user {file}', function ($file) {
     $path = '';
@@ -71,7 +72,7 @@ Artisan::command('import:user {file}', function ($file) {
     DB::transaction(function () use ($users) {
         foreach ($users as $user) {
             try {
-                User::create([
+                User::query()->create([
                     'name' => $user['name'],
                     'username' => $user['username'],
                     'role_id' => $user['role_id'],
