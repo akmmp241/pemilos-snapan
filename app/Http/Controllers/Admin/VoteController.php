@@ -4,13 +4,12 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserCollection;
+use App\Models\Candidate;
 use App\Models\User;
 use App\Models\Vote;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class VoteController extends Controller
 {
@@ -42,5 +41,28 @@ class VoteController extends Controller
         $notYetVoting = $totalValidUsers - $totalValidUsersAlreadyCount;
 
         return view('admin.votes.index', compact('users', 'notYetVoting'));
+    }
+
+    public function liveCount(): JsonResponse
+    {
+        $candidates = Candidate::query()
+            ->select('name', 'label', 'number')
+            ->withCount('votes')
+            ->orderBy('number')
+            ->get();
+
+        $osis = $candidates->where('label', 'OSIS');
+        $mpk = $candidates->where('label', 'MPK');
+
+        return response()->json([
+            'osis' => [
+                'labels' => $osis->pluck('name'),
+                'data' => $osis->pluck('votes_count')
+            ],
+            'mpk' => [
+                'labels' => $mpk->pluck('name'),
+                'data' => $mpk->pluck('votes_count')
+            ]
+        ]);
     }
 }

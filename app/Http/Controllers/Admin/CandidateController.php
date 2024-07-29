@@ -68,7 +68,7 @@ class CandidateController extends Controller
                 'image' => ['required', 'mimes:png,jpg,svg,webp', 'max:2048'],
             ]);
 
-            $data['image'] = $request->file('image')->store('candidates');
+            $data['image'] = $request->file('image')->store('public/candidates');
 
             Storage::delete($candidate->image);
         }

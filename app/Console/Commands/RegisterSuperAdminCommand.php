@@ -21,7 +21,7 @@ class RegisterSuperAdminCommand extends Command
     {
         $credentials = $this->getCredentials();
 
-        $superAdmin = $this->user->newQuery()->create($credentials);
+        $superAdmin = $this->user::query()->create($credentials);
 
         $this->display($superAdmin);
     }

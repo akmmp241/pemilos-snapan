@@ -61,12 +61,12 @@
         @foreach ($candidates as $candidate)
           <div class="flex-auto">
             <label>
-              <input type="radio" name="{{ strtolower($candidate->label) }}" class="hidden vote-input"
+              <input type="radio" required name="{{ strtolower($candidate->label) }}" class="hidden vote-input"
                 value="{{ $candidate->id }}" />
               <div
                 class="flex flex-col items-center max-w-sm overflow-hidden duration-200 bg-white shadow-xl vote-card rounded-xl hover:scale-105 hover:shadow-xl hover:cursor-pointer">
                 <div class="scale-75 sm:min-w-[300px] sm:min-h-[300px] mx-6 mt-10">
-                  <img src="{{ asset('storage/' . $candidate->image) }}" alt="{{ $candidate->name }}"
+                  <img src="{{ asset($candidate->image) }}" alt="{{ $candidate->name }}"
                     class="object-cover w-full h-full mx-auto" />
                 </div>
                 <div class="p-5 text-center">
@@ -81,7 +81,7 @@
     @endforeach
 
     <!-- Button -->
-    <button type="submit" disabled onclick="return window.confirm('Apakah Anda yakin dengan pilihan ini?')"
+    <button type="submit" onclick="return window.confirm('Apakah Anda yakin dengan pilihan ini?')"
       class="flex rounded-3xl px-8 py-4 my-10 w-[90%] mx-auto sm:w-[20%] bg-blue-800 hover:bg-blue-600 dark:text-white">
       <div class="flex items-center justify-between flex-1">
         <span class="text-lg font-medium text-white">Kirim</span>

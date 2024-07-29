@@ -1,3 +1,4 @@
 *
-!candidate-no-pic.jpg
 !.gitignore
+/csv-file
+/candidates

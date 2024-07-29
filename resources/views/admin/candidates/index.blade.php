@@ -65,7 +65,7 @@
             <h4 class="mb-4 font-semibold text-gray-600 dark:text-gray-300">{{ $candidate->name }}</h4>
             <h4 class="mb-4 font-semibold text-gray-600 dark:text-gray-300">{{ $candidate->number }}</h4>
             <img class="mx-auto h-[300px] w-[300px] object-cover rounded-md"
-              src="{{ asset('storage/' . $candidate->image) }}" alt="{{ $candidate->name }}">
+              src="{{ asset($candidate->image) }}" alt="{{ $candidate->name }}">
           </div>
         @endforeach
       </div>

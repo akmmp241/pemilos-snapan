@@ -7,6 +7,7 @@
   <title>E-Voting SMK Negeri 8 Semarang</title>
   @vite('resources/css/app.css')
   @vite('resources/js/main.ts')
+  @livewireStyles
 </head>
 
 <body>
@@ -390,6 +391,7 @@
     </div>
   </section>
 </section>
+@livewireScripts
 </body>
 
 </html>

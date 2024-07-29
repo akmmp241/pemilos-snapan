@@ -13,7 +13,7 @@
 @section('content')
   <h2 class="my-6 text-2xl font-semibold text-gray-700 dark:text-gray-200">
     Tambah User Dengan File (CSV)
-  </h2>2
+  </h2>
 
   <form x-data="{ isStudentRadio: {{ old('role_id' !== App\Models\User::STUDENT) ? 'false' : 'true' }} }"
         action="{{ route('admin.users.csv') }}" method="POST" enctype="multipart/form-data"

@@ -200,12 +200,13 @@ class UserController extends Controller
     {
         abort_if(auth()->user()->role_id !== User::SUPER_ADMIN, 403);
 
-        Storage::putFileAs('csv-file', $request->file('csv-file'), 'test.csv');
+        Storage::putFileAs('csv-file', $request->file('csv-file'), 'mock.csv');
 
-        $csvFile = storage_path('app/public/csv-file/test.csv');
+        $csvFile = storage_path('app/csv-file/mock.csv');
 
         $read = fopen($csvFile, 'r');
 
+        $data[] = null;
         while (!feof($read)) {
             $data[] = fgetcsv($read, 1000, ',');
         }
@@ -213,7 +214,7 @@ class UserController extends Controller
         $data = new Collection($data);
 
         fclose($read);
-        Storage::delete('app/public/csv-file/test.csv');
+        Storage::delete('app/csv-file/mock.csv');
 
         $data->shift();
 
